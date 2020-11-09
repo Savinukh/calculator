@@ -1,0 +1,87 @@
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+
+namespace txt_Read
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            
+            string exeDir = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string inpPath = @".\TestFolder\1\input.txt"; // Относительный путь к файлу
+            string outPath = @".\TestFolder\1\output.txt";
+            string InpResPath = Path.Combine(exeDir, inpPath); // Объединяет две строки в путь.
+            InpResPath = Path.GetFullPath(InpResPath); // Возвращает для указанной строки пути абсолютный путь.
+            if (File.Exists(InpResPath))
+            {
+                string OutresPath = Path.Combine(exeDir, outPath);
+                OutresPath = Path.GetFullPath(OutresPath);
+                using (StreamWriter writer = new StreamWriter(OutresPath))
+                {
+                    string[] lines = File.ReadAllLines(InpResPath);
+                    foreach (string line in lines)
+                    {
+                        string str = line.Replace(" ", "");
+                        int sum = str.IndexOf("+");
+                        int diff = str.IndexOf("-");
+                        int multipl = str.IndexOf("*");
+                        int div = str.IndexOf("/");
+                        if (sum > 0)
+
+                        {
+                            double a = Convert.ToDouble(str.Substring(0, sum));
+                            double b = Convert.ToDouble(str.Substring(sum + 1));
+                            double result = a + b;
+                            writer.WriteLine("{0}= {1}", line, result);
+                        }
+                        if (diff > 0)
+                        {
+                            double a = Convert.ToDouble(str.Substring(0, diff));
+                            double b = Convert.ToDouble(str.Substring(diff + 1));
+                            double result = a - b;
+                            writer.WriteLine("{0}= {1}", line, result);
+                        }
+                        if (multipl > 0)
+                        {
+                            double a = Convert.ToDouble(str.Substring(0, multipl));
+                            double b = Convert.ToDouble(str.Substring(multipl + 1));
+                            double result = a * b;
+                            writer.WriteLine("{0}= {1}", line, result);
+                        }
+                        if (div > 0)
+                        {
+                            double a = Convert.ToDouble(str.Substring(0, div));
+                            double b = Convert.ToDouble(str.Substring(div + 1));
+                            if (b > 0)
+                            {
+                                double result = a / b;
+                                writer.WriteLine("{0}= {1}", line, result);
+                            }
+                            else
+                            {
+                                writer.WriteLine("{0} На 0 делить нельзя", line);
+                            }
+                        }
+                       string ch = Regex.Replace(str, @"[0-9\+\-\*\/\,]", string.Empty);
+                        if (ch != "")
+                        {
+                            writer.WriteLine("{0} В выражении недопустимый символ {1}", line, ch);
+                        }
+                    }
+                    Console.WriteLine("Выполнено. Нажмите любую клавишу");
+                    Console.ReadKey();
+                    Process.Start("notepad.exe", OutresPath);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Текстовый файл не найден");
+            }
+            Console.ReadKey();
+        }
+    }
+}
